@@ -54,7 +54,7 @@ class Purchase(models.Model):
     quantity = models.PositiveIntegerField(default=1)
 
     class Meta:
-        verbose_name_plural = "Purchase"
+        verbose_name_plural = "Purchases"
 
     def __str__(self):
         return f'Consumer {self.сonsumer} buy {self.quantity} ticket\'s for {self.session}' 
