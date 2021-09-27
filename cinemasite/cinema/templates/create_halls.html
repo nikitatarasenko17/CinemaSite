@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <p class="fst-italic" align="right" style="color:black; font-size:30px"> Create halls page </p>
+{% endblock %} 
+
+{% block nav %}
+  <a href={% url 'logout' %} class="btn btn-warning m-1" role="button"> Logout </a>
+  <a href={% url 'session_list' %} class="btn btn-primary m-1" role="button"> Return to main page </a> 
+{% endblock %}
+
+{% block content %}
+<form method="post" action="{% url 'create_halls' %}">
+    {% csrf_token %}
+    <p>Hall name: {{form.name}}</p>
+    <p>Hall size: {{form.size}}</p>
+    <input type="submit" value="Create">
+</form>
+{% endblock %}

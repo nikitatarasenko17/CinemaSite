@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <p class="fst-italic" align="right" style="color:black; font-size:30px"> Create halls page </p>
+{% endblock %} 
+
+{% block nav %}
+  <a href={% url 'logout' %} class="btn btn-warning m-1" role="button"> Logout </a>
+  <a href={% url 'session_list' %} class="btn btn-primary m-1" role="button"> Return to main page </a> 
+{% endblock %}
+
+{% block content %}
+<form method="post" action="{% url 'create_movies' %}">
+    {% csrf_token %}
+    <p>Title: {{form.title}}</p>
+    <p>Release year: <input type="year" name="release_year" id="release_year" required></p>
+    <p>Duration: <input type="number step="any" name="duration" id="duration" required> minutes</p>
+    <p>Description: <input type="number step="any" name="description" id="description" required></p>
+    
+    <input type="submit" value="Create">
+</form>
+{% endblock %}

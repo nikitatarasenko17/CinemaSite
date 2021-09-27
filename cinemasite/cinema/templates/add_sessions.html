@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <p class="fst-italic" align="right" style="color:black; font-size:30px"> Create session page </p>
+{% endblock %} 
+
+{% block nav %}
+  <a href={% url 'logout' %} class="btn btn-warning m-1" role="button"> Logout </a>
+  <a href={% url 'session_list' %} class="btn btn-primary m-1" role="button"> Return to main page </a>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+      {% csrf_token %}
+      <p>Movie title: {{form.movie_title}}</p>
+      <p>Hall name: {{form.hall_name}}</p>
+      <p>Start session time: <input type="time" name="start_session_time" id="id_start_session_time" required></p>
+      <p>End session time: <input type="time" name="end_session_time" id="id_end_session_time" required></p>
+      <p>Date start show: <input type="date" name="date_start_show" id="id_date_start_show" required></p>
+      <p>Date end show: <input type="date" name="date_end_show" id="id_date_end_show" required></p>
+      <p>Price: <input type="number step="any" name="price" id="id_price" required> UAH</p>
+      
+      <input type="submit" value="Create">
+  </form>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    <p class="fst-italic" align="right" style="color:black; font-size:30px">List of sessions</p>
+{% endblock %}
+{% block nav %}
+<nav class="navbar navbar-light" style="background-color: #eaafc8">
+    <div class="d-grid gap-4 d-md-flex justify-content-md-end">
+        {% if not request.user.is_authenticated %} 
+        <a href={% url 'login' %} class="btn btn-warning  m-1" role="button"> Login </a>
+        <a href={% url 'register' %} class="btn btn-warning m-1 " role="button"> Registration </a>
+        <a href={% url 'list_of_movies' %} class="btn btn-warning m-1 " role="button"> List of movies </a>
+    </div>
+    {% elif not request.user.is_superuser %}
+            <a href={% url 'logout' %} class="btn btn-primary me-md-2" role="button"> Logout </a>
+            <a href={% url 'list_of_movies' %} class="btn btn-warning m-1 " role="button"> List of movies </a>
+    {% else %}
+            <a href={% url 'logout' %} class="btn btn-warning m-1" role="button"> Logout </a>
+            <a href={% url 'create_movies' %} class="btn btn-success m-1" role="button"> Create movies </a>           
+            <a href={% url 'create_halls' %} class="btn btn-success m-1" role="button"> Create halls </a>
+            <a href={% url 'add_sessions' %} class="btn btn-success m-1" role="button"> Create sessions </a>
+            <a href={% url 'list_of_movies' %} class="btn btn-warning m-1 " role="button"> List of movies </a>
+    {% endif %}
+  </nav>
+{% endblock %}
+
+{% block content %}
+<div>
+  {% for obj in object_list %}
+  <div>
+      <h3>{{ obj.title }} </h3>
+      Release year: {{ obj.release_year }} <br>
+      Duration year: {{ obj.duration }} <br>
+      Description: {{ obj.description }} <br>
+  </div> 
+  {% endfor %}
+{% endblock %}
+

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    <p class="fst-italic" align="right" style="color:black; font-size:30px">List of sessions</p>
+{% endblock %}
+{% block nav %}
+<nav class="navbar navbar-light" style="background-color: #eaafc8">
+    <div class="d-grid gap-4 d-md-flex justify-content-md-end">
+        {% if not request.user.is_authenticated %} 
+        <a href={% url 'login' %} class="btn btn-warning  m-1" role="button"> Login </a>
+        <a href={% url 'register' %} class="btn btn-warning m-1 " role="button"> Registration </a>
+        <a href={% url 'list_of_movies' %} class="btn btn-warning m-1 " role="button"> List of movies </a>
+    </div>
+    {% elif not request.user.is_superuser %}
+            <a href={% url 'logout' %} class="btn btn-primary me-md-2" role="button"> Logout </a>
+            <a href={% url 'list_of_movies' %} class="btn btn-warning m-1 " role="button"> List of movies </a>
+            <a href={% url 'list_of_purchases' %} class="btn btn-warning m-1 " role="button"> List of purchases </a>
+    {% else %}
+            <a href={% url 'logout' %} class="btn btn-warning m-1" role="button"> Logout </a>
+            <a href={% url 'create_movies' %} class="btn btn-success m-1" role="button"> Create movies </a>           
+            <a href={% url 'create_halls' %} class="btn btn-success m-1" role="button"> Create halls </a>
+            <a href={% url 'add_sessions' %} class="btn btn-success m-1" role="button"> Create sessions </a>
+            <a href={% url 'list_of_movies' %} class="btn btn-warning m-1 " role="button"> List of movies </a>
+    {% endif %}
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto my-1 my-sm-2 my-lg-1 p-1">
+<form method="get" action="{% url 'session_list' %}">
+    {{ sort }}
+    <!-- <input type="hidden" name="show_date" value="{{ request.GET.movie_title }}">
+    <input type="hidden" name="show_date" value="{{ request.GET.movie_title }}"> -->
+    <input type="submit" value="Sort">
+</form>
+</div>
+
+{% if request.user.is_superuser %}
+
+  {% for obj in object_list %}
+  <div class="card-group justify-content-center align-items-center">
+    <div class="card text-dark bg-warning" style="max-width: 18rem;">
+    <div class="card-body">
+    <form action="{% url 'session_list' %}" method="post" class="sort-form">
+      <div>
+      <div class="card-header" style="background-color: #9ee0b4"> Movie: {{ obj.movie_title }}</div>
+      <h6 class="card-text">    <p> Hall name: {{ obj.hall_name }}</h6>
+      <h6>Start session time: {{ obj.start_session_time }}</h6>
+      <h6>End session time: {{ obj.end_session_time }}</h6>
+      <h6>Date start show: {{ obj.date_start_show }}</h6>
+      <h6>Date end show: {{ obj.date_end_show }}</h6>  
+      <h6>Free seats: {{ obj.free_seats }}</h6>  
+      <h6>Price: {{ obj.price}}</h6>  
+      <h6>Is active: {{ obj.is_active}}</h6><br>
+    </form>
+      <form method="get" action="{% url 'update_sessions' obj.pk %}">
+        <input type="submit" value="Update movie">
+      </form> 
+
+      <form method="get" action="{% url 'update_halls' obj.hall_name.pk %}">
+        <input type="submit" value="Update halls">
+      </form>       
+
+    </div> 
+  </div> 
+</div>
+{% endfor %}
+
+{% elif request.user.is_authenticated %}
+{% csrf_token %}
+  {% for obj in object_list %}
+  <form method="post" action="{% url 'purchase_create' %}">
+  <div class="card-group justify-content-center align-items-center">
+    <div class="card text-dark bg-warning" style="max-width: 18rem;">
+    <div class="card-body">
+      <div>
+      <div class="card-header" style="background-color: #9ee0b4"> Movie: {{ obj.movie_title }}</div>
+      <h6 class="card-text">    <p> Hall name: {{ obj.hall_name }}</h6>
+      <h6>Start session time: {{ obj.start_session_time }}</h6>
+      <h6>End session time: {{ obj.end_session_time }}</h6>
+      <h6>Date start show: {{ obj.date_start_show }}</h6>
+      <h6>Date end show: {{ obj.date_end_show }}</h6>  
+      <h6>Free seats: {{ obj.free_seats }}</h6>  
+      <h6>Price: {{ obj.price}}</h6>  
+      <h6>Is active: {{ obj.is_active}}</h6><br>
+      Quantity to buy: {{ purchase_form }}
+      {% csrf_token %}
+      <input type="hidden" name="session_id" value="{{ obj.id }}">
+      <button type="submit" value="Buy">Buy</button>  
+    </div> 
+  </div> 
+</form>
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}
+
