@@ -25,12 +25,21 @@
 {% endblock %}
 
 {% block content %}
+<div class="card-group justify-content-center align-items-center">
+    <div class="card text-dark bg-warning" style="max-width: 18rem;">
+    <div class="card-body">
+Consumer: {{user}}<br>
+Spent: {{user.spent}}<br>
 {% for obj in object_list %}
-        Consumer: {{ obj}}<br>
+<div>
         Product: {{ obj.session.movie_title }}<br>
         Session: {{ obj.session }}<br>
         Quantity: {{obj.quantity}}<br>
-{% endfor %}      
+</div>
+{% endfor %}   
+</div> 
+</div> 
+</div>   
 {% endblock %}
 
 

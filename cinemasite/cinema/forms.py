@@ -38,6 +38,7 @@ class SortForm(forms.Form):
         ('PriceLH', 'Low to high'),('PriceHL', 'High to Low')])
 
 class PurchaseForm(ModelForm):
+    quantity = forms.IntegerField(min_value=1)
     class Meta:
         model = Purchase
-        fields = ['quantity']
+        fields = ('quantity',)

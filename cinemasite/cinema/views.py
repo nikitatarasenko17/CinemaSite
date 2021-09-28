@@ -1,8 +1,9 @@
 from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.mixins import LoginRequiredMixin, LoginSuperUserRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, LoginSuperUserRequiredMixin 
 from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.db.models import Sum
 from cinema.models import Hall, Movies, Sessions, Purchase
 from cinema.forms import RegisterForm, SessionCreateForm, HallsCreateForm, MoviesCreateForm, PurchaseForm, SortForm
 
@@ -51,7 +52,6 @@ class SessionsListView(ListView):
 
 class SessionCreateView(LoginSuperUserRequiredMixin, CreateView):
     model = Sessions
-    permission_required = 'is_superuser'
     form_class = SessionCreateForm
     success_url = '/add_sessions/'
     template_name = 'add_sessions.html'
@@ -90,32 +90,31 @@ class ProductPurchaseView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         purchase = form.save(commit=False)
-        purchase.consumer = self.request.user
-        session = Sessions.objects.get(id=self.request.POST['session_id'])
-        cash = session.price * purchase.quantity
-        free_seats = session.free_seats - purchase.quantity
-
-        if free_seats > 0:
-            session.free_seats -= purchase.quantity
-            consumer = self.request.user
-            consumer.spent += cash
-            purchase.session_id = self.request.POST['session_id']
-            session.save()
-            consumer.save()
-            purchase.save()
-            return super().form_valid(form=form)
-        else:
-            messages.error(self.request,'No available amount')
+        quantity = int(form.data['quantity'])
+        user = self.request.user
+        purchase.сonsumer = user
+        session = Sessions.objects.get(id=self.request.POST['session'])
+        purchase.session = session
+        hall = session.hall_name
+        total_quantity = session.purchase_session.aggregate(Sum('quantity'))['quantity__sum']
+        if not total_quantity:
+            total_quantity = 0
+        free_seats = hall.size - total_quantity
+        if free_seats < quantity:
+            messages.error(self.request, f'Dont enough free seats! Quantity of free seats: {free_seats}')
             return redirect(f"/")
-
+        user.spent += quantity * session.price
+        user.save()
+        return super().form_valid(form=form)
+       
 class ProductPurchaseListView(LoginRequiredMixin, ListView):
+    login_url = "login/"
     model = Purchase
     template_name = 'purchases_list.html'
-    paginate_by = 5
+    
+    # def get_queryset(self):
+    #     return super().get_queryset().filter(consumer=self.request.user)
 
-    def get_queryset(self):
-        queryset = super().get_queryset().filter(consumer=self.request.user)
-        return queryset
 
 class UpdateProductView(LoginSuperUserRequiredMixin, UpdateView):
     template_name = 'update_sessions.html'

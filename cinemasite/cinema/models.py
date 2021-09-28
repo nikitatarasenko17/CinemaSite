@@ -12,7 +12,7 @@ class Hall(models.Model):
     size = models.PositiveIntegerField()
 
     class Meta:
-        verbose_name_plural = "Hall"
+        verbose_name_plural = "Halls"
 
     def __str__(self):
         return f'Hall {self.name} of size {self.size}'  
@@ -48,8 +48,8 @@ class Sessions(models.Model):
         return f'Session {self.movie_title} in the hall {self.hall_name}'  
 
 class Purchase(models.Model):
-    сonsumer = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='consumer_purchase')
-    session = models.ForeignKey(Sessions, on_delete=models.CASCADE, related_name='purchase_session')
+    сonsumer = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='consumer_purchase', blank=True)
+    session = models.ForeignKey(Sessions, on_delete=models.CASCADE, related_name='purchase_session', blank=True)
     time_created = models.DateTimeField(auto_now_add=True)
     quantity = models.PositiveIntegerField(default=1)
 
