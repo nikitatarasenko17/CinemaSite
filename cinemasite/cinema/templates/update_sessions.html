@@ -1,17 +1,12 @@
 {% extends 'base.html' %}
  
 {% block title %}
-    <h1 align="center"  style="color:#0000FF; font-size:30px">Update purchases page </h1>
-{% endblock %} 
-
-{% block nav %}
-  <li><a href={% url 'logout' %}><button> Logout </button></a></li>
+    <p class="fst-italic" align="right" style="color:black; font-size:30px">Update sessions</p>
 {% endblock %}
 
 {% block content %}
-    <h1>Update Sessions</h1>
     <form method="post">{% csrf_token %}
       {{ form.as_p }}
-    <button type="submit" value="update">Update</button>
+      <button type="submit" class="btn btn-primary m-1">Update sessions</button>
     </form>
 {% endblock %}

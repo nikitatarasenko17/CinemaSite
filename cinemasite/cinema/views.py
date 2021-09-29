@@ -3,6 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, LoginSuperUserRequire
 from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.utils import timezone
+from datetime import date, timedelta
 from django.db.models import Sum
 from cinema.models import Hall, Movies, Sessions, Purchase
 from cinema.forms import RegisterForm, SessionCreateForm, HallsCreateForm, MoviesCreateForm, PurchaseForm, SortForm
@@ -31,7 +33,15 @@ class SessionsListView(ListView):
     model = Sessions
     template_name = 'session_list.html'
     extra_context = {'purchase_form': PurchaseForm, }
-    paginate_by = 5
+    paginate_by = 3
+
+    # def get_queryset(self):
+    #     today = timezone.now()
+    #     tomorrow = timezone.now() + timedelta(days=1)
+            # if self.request.GET.get()
+    #     queryset = Sessions.objects.filter(start_session_time__gte = today)
+            # queryset = Sessions.objects.filter(start_session_time__gte = tomorrow)
+    #     return super().get_queryset()
 
     def get_ordering(self):
         sort_form = self.request.GET.get('sort_form')
@@ -53,8 +63,8 @@ class SessionsListView(ListView):
 class SessionCreateView(LoginSuperUserRequiredMixin, CreateView):
     model = Sessions
     form_class = SessionCreateForm
-    success_url = '/add_sessions/'
-    template_name = 'add_sessions.html'
+    success_url = '/create_sessions/'
+    template_name = 'create_sessions.html'
     
     def form_valid(self, form):
         movie = form.save(commit=False)
@@ -101,7 +111,7 @@ class ProductPurchaseView(LoginRequiredMixin, CreateView):
             total_quantity = 0
         free_seats = hall.size - total_quantity
         if free_seats < quantity:
-            messages.error(self.request, f'Dont enough free seats! Quantity of free seats: {free_seats}')
+            messages.error(self.request, f'Dont enough free seats! Available seats: {free_seats}')
             return redirect(f"/")
         user.spent += quantity * session.price
         user.save()
@@ -112,8 +122,8 @@ class ProductPurchaseListView(LoginRequiredMixin, ListView):
     model = Purchase
     template_name = 'purchases_list.html'
     
-    # def get_queryset(self):
-    #     return super().get_queryset().filter(consumer=self.request.user)
+    def get_queryset(self):
+        return super().get_queryset().filter(consumer=self.request.user)
 
 
 class UpdateProductView(LoginSuperUserRequiredMixin, UpdateView):

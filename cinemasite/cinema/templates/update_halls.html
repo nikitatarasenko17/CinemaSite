@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
  
 {% block title %}
-    <h1 align="center"  style="color:#0000FF; font-size:30px">Update purchases page </h1>
-{% endblock %} 
+    <p class="fst-italic" align="right" style="color:black; font-size:30px">Update halls</p>
+{% endblock %}
 
 {% block nav %}
-  <li><a href={% url 'logout' %}><button> Logout </button></a></li>
+<a href={% url 'logout' %} class="btn btn-primary me-md-2" role="button"> Logout </a>
+<a href={% url 'session_list' %} class="btn btn-primary m-1" role="button"> Return to main page </a>
 {% endblock %}
 
 {% block content %}
-    <h1>Update Sessions</h1>
     <form method="post">{% csrf_token %}
       {{ form.as_p }}
-    <button type="submit" value="update">Update</button>
+      <button type="submit" class="btn btn-primary m-1">Update halls</button>
     </form>
 {% endblock %}

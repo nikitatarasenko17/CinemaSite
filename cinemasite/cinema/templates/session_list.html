@@ -12,14 +12,14 @@
         <a href={% url 'register' %} class="btn btn-warning m-1 " role="button"> Registration </a>
         <a href={% url 'list_of_movies' %} class="btn btn-warning m-1 " role="button"> List of movies </a>
         {% elif not request.user.is_superuser %}
-            <a href={% url 'logout' %} class="btn btn-primary  m-1" role="button"> Logout </a>
+            <a href={% url 'logout' %} class="btn btn-primary m-1" role="button"> Logout </a>
             <a href={% url 'list_of_purchases' %} class="btn btn-warning m-1 " role="button"> List of purchases </a>
           {% elif request.user.is_superuser %}
             <a href={% url 'logout' %} class="btn btn-primary m-1" role="button"> Logout </a>
             <a href={% url 'list_of_movies' %} class="btn btn-warning m-1 " role="button"> List of movies </a>
             <a href={% url 'create_movies' %} class="btn btn-success m-1" role="button"> Create movies </a>           
             <a href={% url 'create_halls' %} class="btn btn-success m-1" role="button"> Create halls </a>
-            <a href={% url 'add_sessions' %} class="btn btn-success m-1" role="button"> Create sessions </a>
+            <a href={% url 'create_sessions' %} class="btn btn-success m-1" role="button"> Create sessions </a>
       {% endif %}
   </div>
 </nav>
@@ -52,19 +52,20 @@
       <h6>Is active: {{ session.is_active}}</h6><br>
     </form>
       <form method="get" action="{% url 'update_sessions' session.pk %}">
-        <input type="submit" value="Update movie">
+        <button type="submit" value="Update movie" class="btn btn-primary m-1">Update sessions</button> 
       </form> 
 
       <form method="get" action="{% url 'update_halls' session.hall_name.pk %}">
-        <input type="submit" value="Update halls">
+        <button type="submit" value="Update halls" class="btn btn-primary m-1">Update halls</button> 
       </form>       
 
     </div> 
-  </div> 
+    </div> 
 </div>
 {% endfor %}
 
 {% elif request.user.is_authenticated %}
+
   {% for session in object_list %}
   <form method="post" action="{% url 'purchase_create' %}">
     {% csrf_token %}
@@ -83,11 +84,49 @@
       <h6>Is active: {{ session.is_active}}</h6><br>
       {{ purchase_form }}
       <input type="hidden"  name="session" value="{{ session.pk }}">
-      <button type="submit" value="Buy" class="btn btn-success m-1">Buy</button>  
-    </form>
+      <button type="submit" value="Buy" class="btn btn-primary m-1">Buy</button>  
+  </form>
+    </div> 
+  </div> 
+</div>
+{% endfor %}
+
+{% elif request.user.is_anonymous %}
+
+  {% for session in object_list %}
+  <div class="card-group justify-content-center align-items-center">
+    <div class="card text-dark bg-warning" style="max-width: 18rem;">
+    <div class="card-body">
+      <div>
+      <div class="card-header" style="background-color: #9ee0b4"> Movie: {{ session.movie_title }}</div>
+      <h6 class="card-text">    <p> Hall name: {{ session.hall_name }}</h6>
+      <h6>Start session time: {{ session.start_session_time }}</h6>
+      <h6>End session time: {{ session.end_session_time }}</h6>
+      <h6>Date start show: {{ session.date_start_show }}</h6>
+      <h6>Date end show: {{ session.date_end_show }}</h6>  
+      <h6>Free seats: {{ session.free_seats }}</h6>  
+      <h6>Price: {{ session.price}}</h6>  
+      <h6>Is active: {{ session.is_active}}</h6><br>
     </div> 
   </div> 
 </div>
 {% endfor %}
 {% endif %}
+{% endblock %}
+
+
+{% block last %}
+  {% if page_obj.has_previous %}
+              <a href="?page=1">&laquo; first</a>
+              <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+          {% endif %}
+  
+          <span class="current">
+              Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+          </span>
+  
+          {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}">next</a>
+              <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+          {% endif %}
 {% endblock %}

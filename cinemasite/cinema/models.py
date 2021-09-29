@@ -27,7 +27,7 @@ class Movies(models.Model):
         verbose_name_plural = "Movies"
 
     def __str__(self):
-        return f'Movie {self.title} realised in {self.release_year}'   
+        return f'{self.title}'   
 
 
 class Sessions(models.Model):
