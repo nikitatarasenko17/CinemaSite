@@ -38,10 +38,11 @@ class SessionsListView(ListView):
     # def get_queryset(self):
     #     today = timezone.now()
     #     tomorrow = timezone.now() + timedelta(days=1)
-            # if self.request.GET.get()
-    #     queryset = Sessions.objects.filter(start_session_time__gte = today)
-            # queryset = Sessions.objects.filter(start_session_time__gte = tomorrow)
-    #     return super().get_queryset()
+    #     if self.request.GET.get('day_filter') == today:
+    #         queryset = Sessions.objects.filter(start_session_time__gte = today)
+    #     elif self.request.GET.get('day_filter') == today:
+    #         queryset = Sessions.objects.filter(start_session_time__gte = tomorrow)
+    #     return queryset
 
     def get_ordering(self):
         sort_form = self.request.GET.get('sort_form')
@@ -122,9 +123,8 @@ class ProductPurchaseListView(LoginRequiredMixin, ListView):
     model = Purchase
     template_name = 'purchases_list.html'
     
-    def get_queryset(self):
-        return super().get_queryset().filter(consumer=self.request.user)
-
+    # def get_queryset(self):
+    #     return super().get_queryset().filter(consumer=self.request.user)
 
 class UpdateProductView(LoginSuperUserRequiredMixin, UpdateView):
     template_name = 'update_sessions.html'

@@ -1,6 +1,6 @@
 from cinema.API.resources import HallViewSet, SessionsViewSet, PurchaseViewSet, MovieViewSet
 from .views import SessionsListView, Login, Register, Logout, SessionCreateView, UpdateProductView,\
-                    HallsCreateView, UpdateHallsView, MoviesCreateView, MoviesListView, ProductPurchaseListView
+                    HallsCreateView, UpdateHallsView, MoviesCreateView, MoviesListView, ProductPurchaseView, ProductPurchaseListView
 from rest_framework.routers import SimpleRouter
 from django.urls import path, include
 from rest_framework.authtoken import views
@@ -24,7 +24,7 @@ urlpatterns = [
     path('update_halls/<int:pk>/', UpdateHallsView.as_view(), name = 'update_halls'),
     path('movies/create_movies/', MoviesCreateView.as_view(), name = 'create_movies'),    
     path('movies/list_of_movies', MoviesListView.as_view(), name = 'list_of_movies'), 
-    path('purchase_create/', MoviesListView.as_view(), name = 'purchase_create'),
+    path('purchase_create/', ProductPurchaseView.as_view(), name = 'purchase_create'),
     path('list_of_purchases', ProductPurchaseListView.as_view(), name = 'list_of_purchases'),
     path('api/', include(router.urls)),
     path('api-token-auth/', views.obtain_auth_token),
