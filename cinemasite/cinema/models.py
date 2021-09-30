@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from datetime import datetime
 from django.db import models
 
 class MyUser(AbstractUser):
@@ -43,6 +44,15 @@ class Sessions(models.Model):
 
     class Meta:
         verbose_name_plural = "Sessions"
+    
+    def check_status(self):
+        if self.start_session_time <datetime.now().time() < self.end_session_time:
+            self.is_active = False
+        return self.is_active    
+
+    def save(self, *args, **kwargs):
+        self.check_status()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'Session {self.movie_title} in the hall {self.hall_name}'  

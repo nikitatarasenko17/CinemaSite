@@ -1,5 +1,6 @@
 from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.mixins import LoginRequiredMixin, LoginSuperUserRequiredMixin 
+from django.contrib.auth.mixins import LoginRequiredMixin, LoginSuperUserRequiredMixin
+from django.http import request 
 from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -7,7 +8,8 @@ from django.utils import timezone
 from datetime import date, timedelta
 from django.db.models import Sum
 from cinema.models import Hall, Movies, Sessions, Purchase
-from cinema.forms import RegisterForm, SessionCreateForm, HallsCreateForm, MoviesCreateForm, PurchaseForm, SortForm
+from cinema.forms import RegisterForm, SessionCreateForm, HallsCreateForm, MoviesCreateForm, \
+                        PurchaseForm, SortForm
 
 
 class Login(LoginView):
@@ -32,17 +34,33 @@ class Register(CreateView):
 class SessionsListView(ListView):
     model = Sessions
     template_name = 'session_list.html'
+    # form_class = SessionForm
     extra_context = {'purchase_form': PurchaseForm, }
     paginate_by = 3
 
     # def get_queryset(self):
     #     today = timezone.now()
     #     tomorrow = timezone.now() + timedelta(days=1)
-    #     if self.request.GET.get('day_filter') == today:
-    #         queryset = Sessions.objects.filter(start_session_time__gte = today)
-    #     elif self.request.GET.get('day_filter') == today:
-    #         queryset = Sessions.objects.filter(start_session_time__gte = tomorrow)
-    #     return queryset
+    #     if self.request.method =="POST":
+    #         user_form = SessionForm(data=self.request.POST)
+    #         if user_form.is_valid():
+    #             if self.request.POST['session_form'] == 'Today':
+    #                 self.queryset = Sessions.objects.filter(start_session_time__gte = today)
+    #             elif self.request.POST['session_form'] == 'Tomorrow':
+    #                 self.queryset = Sessions.objects.filter(start_session_time__gte = tomorrow) 
+    #     else:
+    #         user_form = SessionForm()
+    #     return self.queryset
+    def get_queryset(self):
+        today = timezone.now()
+        tomorrow = timezone.now() + timedelta(days=1)
+        session_form = self.request.GET.get('session_form')
+
+        if session_form == 'Today':
+            return super().get_queryset().filter(date_start_show__lte = today, date_end_show__gt = today)
+        elif session_form == 'Tomorrow':
+            return super().get_queryset().filter(date_start_show__lte = tomorrow, date_end_show__gt = tomorrow)
+        return super().get_queryset().filter(date_end_show__gt = today)
 
     def get_ordering(self):
         sort_form = self.request.GET.get('sort_form')
@@ -51,7 +69,6 @@ class SessionsListView(ListView):
         elif sort_form == 'PriceHL':
             self.ordering = ['-price']                         
         elif sort_form == "Time":
-            print("I am here!")
             self.ordering = ['start_session_time']
         return self.ordering
 
@@ -116,6 +133,7 @@ class ProductPurchaseView(LoginRequiredMixin, CreateView):
             return redirect(f"/")
         user.spent += quantity * session.price
         user.save()
+        purchase.save()
         return super().form_valid(form=form)
        
 class ProductPurchaseListView(LoginRequiredMixin, ListView):
@@ -137,6 +155,7 @@ class UpdateProductView(LoginSuperUserRequiredMixin, UpdateView):
     model = Sessions
     form_class = SessionCreateForm
     success_url = '/'
+
 
 class UpdateHallsView(LoginSuperUserRequiredMixin, UpdateView):
     template_name = 'update_halls.html'

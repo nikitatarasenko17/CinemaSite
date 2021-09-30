@@ -26,18 +26,30 @@
 {% endblock %}
 
 {% block content %}
+
+<div>
 <div class="mx-auto my-1 my-sm-2 my-lg-1 p-1">
 <form method="get" action="{% url 'session_list' %}">
     {{ sort }}
-    <input type="submit" value="Sort">
+    <button class="btn btn-primary m-1" role="button" value="Sort">Sort</button>
 </form>
 </div>
+
+{% if not request.user.is_anonymous %}
+<div>
+  <form method='get' action="{% url 'session_list' %}">
+  <input class="btn btn-outline-dark" type="checkbox" value='Today' name="session_form"/>For today
+  <input class="btn btn-outline-dark" type="checkbox" value='Tomorrow' name='session_form'/>For tomorrow
+  <button class="btn btn-primary m-1" role="button" value="Sort">Apply</button>
+</form>
+</div>
+{% endif %}
 
 {% if request.user.is_superuser %}
 
   {% for session in object_list %}
   <div class="card-group justify-content-center align-items-center">
-    <div class="card text-dark bg-warning" style="max-width: 18rem;">
+    <div class="card text-dark bg-warning" style="max-width: 15rem;">
     <div class="card-body">
     <form action="{% url 'session_list' %}" method="post" class="sort-form">
       <div>
@@ -50,7 +62,9 @@
       <h6>Free seats: {{ session.free_seats }}</h6>  
       <h6>Price: {{ session.price}}</h6>  
       <h6>Is active: {{ session.is_active}}</h6><br>
-    </form>
+      </form>
+    </div>
+    <div>
       <form method="get" action="{% url 'update_sessions' session.pk %}">
         <button type="submit" value="Update movie" class="btn btn-primary m-1">Update sessions</button> 
       </form> 
@@ -58,8 +72,7 @@
       <form method="get" action="{% url 'update_halls' session.hall_name.pk %}">
         <button type="submit" value="Update halls" class="btn btn-primary m-1">Update halls</button> 
       </form>       
-
-    </div> 
+    </div>
     </div> 
 </div>
 {% endfor %}
@@ -70,7 +83,7 @@
   <form method="post" action="{% url 'purchase_create' %}">
     {% csrf_token %}
   <div class="card-group justify-content-center align-items-center">
-    <div class="card text-dark bg-warning" style="max-width: 18rem;">
+    <div class="card text-dark bg-warning" style="max-width: 15rem;">
     <div class="card-body">
       <div>
       <div class="card-header" style="background-color: #9ee0b4"> Movie: {{ session.movie_title }}</div>
@@ -95,7 +108,7 @@
 
   {% for session in object_list %}
   <div class="card-group justify-content-center align-items-center">
-    <div class="card text-dark bg-warning" style="max-width: 18rem;">
+    <div class="card text-dark bg-warning" style="max-width: 15rem;">
     <div class="card-body">
       <div>
       <div class="card-header" style="background-color: #9ee0b4"> Movie: {{ session.movie_title }}</div>
@@ -112,8 +125,19 @@
 </div>
 {% endfor %}
 {% endif %}
-{% endblock %}
 
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            {% if message.tags == "error" %}
+                <li style= "color:rgba(255, 0, 0, 0.74);">
+                    {{ message }}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}
 
 {% block last %}
   {% if page_obj.has_previous %}
