@@ -20,7 +20,6 @@ class Hall(models.Model):
 
 class Movies(models.Model):
     title = models.CharField(max_length=50)
-    duration = models.PositiveSmallIntegerField(blank=True, null=True)
     release_year = models.PositiveSmallIntegerField(blank=True, null=True)
     description = models.CharField(max_length=255)
 
@@ -45,13 +44,13 @@ class Sessions(models.Model):
     class Meta:
         verbose_name_plural = "Sessions"
     
-    def check_status(self):
+    def check_is_active(self):
         if self.start_session_time <datetime.now().time() < self.end_session_time:
             self.is_active = False
         return self.is_active    
 
     def save(self, *args, **kwargs):
-        self.check_status()
+        self.check_is_active()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -61,7 +60,7 @@ class Purchase(models.Model):
     сonsumer = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='consumer_purchase', blank=True)
     session = models.ForeignKey(Sessions, on_delete=models.CASCADE, related_name='purchase_session', blank=True)
     time_created = models.DateTimeField(auto_now_add=True)
-    quantity = models.PositiveIntegerField(default=1)
+    quantity = models.PositiveIntegerField()
 
     class Meta:
         verbose_name_plural = "Purchases"

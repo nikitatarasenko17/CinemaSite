@@ -1,4 +1,4 @@
-from cinema.API.resources import HallViewSet, SessionsViewSet, PurchaseViewSet, MovieViewSet
+from cinema.API.resources import HallViewSet, TomorrowSessionsViewSet, TodaySessionsViewSet, PurchaseViewSet, MovieViewSet
 from .views import SessionsListView, Login, Register, Logout, SessionCreateView, UpdateProductView,\
                     HallsCreateView, UpdateHallsView, MoviesCreateView, MoviesListView, ProductPurchaseView, ProductPurchaseListView
 from rest_framework.routers import SimpleRouter
@@ -7,11 +7,10 @@ from rest_framework.authtoken import views
 
 router = SimpleRouter()
 router.register(r'halls', HallViewSet)
-router.register(r'sessions', SessionsViewSet)
+router.register(r'today_sessions', TodaySessionsViewSet)
+router.register(r'tomorrow_sessions', TomorrowSessionsViewSet)
 router.register(r'purchases', PurchaseViewSet)
 router.register(r'movies', MovieViewSet)
-# router.register(r'returns', AdminReturnViewSet)
-
 
 urlpatterns = [
     path('', SessionsListView.as_view(), name='session_list'),

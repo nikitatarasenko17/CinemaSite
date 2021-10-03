@@ -14,7 +14,6 @@
     {% csrf_token %}
     <p>Title: {{form.title}}</p>
     <p>Release year: <input type="year" name="release_year" id="release_year" required></p>
-    <p>Duration: <input type="number step="any" name="duration" id="duration" required> minutes</p>
     <p>Description: <input type="number step="any" name="description" id="description" required></p>
     
     <button type="submit" class="btn btn-primary m-1">Create</button>  

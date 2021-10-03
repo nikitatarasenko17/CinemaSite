@@ -6,6 +6,8 @@ from cinema.models import Hall, Movies, Sessions, Purchase, MyUser
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from django.utils import timezone
+from datetime import timedelta
 
 class UserViewSet(ModelViewSet):
     queryset = MyUser.objects.all()
@@ -15,12 +17,14 @@ class UserViewSet(ModelViewSet):
 class MovieViewSet(ModelViewSet):
     queryset = Movies.objects.all()
     serializer_class = MovieSerializer
+    http_method_names = ['get', 'post', 'put', 'patch']
     
 
 class HallViewSet(ModelViewSet):
     queryset = Hall.objects.all()
     serializer_class = HallSerializer
     permission_classes = [IsAdminUser, ]
+    http_method_names = ['get', 'post', 'put', 'patch']
 
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -28,10 +32,22 @@ class HallViewSet(ModelViewSet):
         return super().get_permissions()    
 
 
-class SessionsViewSet(ModelViewSet):
+class TodaySessionsViewSet(ModelViewSet):
+    queryset = Sessions.objects.all()
+    serializer_class = SessionsSerializer
+    
+
+    def get_queryset(self):
+        today = timezone.now()
+        return Sessions.objects.filter(date_start_show__lte = today, date_end_show__gt = today)
+
+class TomorrowSessionsViewSet(ModelViewSet):
     queryset = Sessions.objects.all()
     serializer_class = SessionsSerializer
 
+    def get_queryset(self):
+        tomorrow = timezone.now() + timedelta(days=1)
+        return Sessions.objects.filter(date_start_show__lte = tomorrow, date_end_show__gt = tomorrow)
 
 class PurchaseViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated, ]
@@ -39,10 +55,6 @@ class PurchaseViewSet(ModelViewSet):
     serializer_class = PurchaseSerializer
 
     def get_queryset(self):
-        return super().get_queryset().filter(consumer=self.request.user)    
+        return self.request.user.consumer_purchase.all()    
 
-    # def list(self, request, *args, **kwargs):
-    #     queryset = Purchase.objects.filter(consumer=self.request.user)
-    #     serializer = PurchaseSerializer(queryset, many=True)
-    #     return Response(serializer.data)
 

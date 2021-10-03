@@ -4,6 +4,10 @@
     <p class="fst-italic" align="right" style="color:black; font-size:30px">Update sessions</p>
 {% endblock %}
 
+{% block nav %}
+<a href={% url 'session_list' %} class="btn btn-primary m-1" role="button"> Return to main page </a>
+{% endblock %}
+
 {% block content %}
     <form method="post">{% csrf_token %}
       {{ form.as_p }}

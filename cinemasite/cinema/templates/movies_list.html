@@ -27,9 +27,8 @@
 <div>
   {% for obj in object_list %}
   <div>
-      <h3>{{ obj.title }} </h3>
+      <h3>Title: {{ obj.title }} </h3>
       Release year: {{ obj.release_year }} <br>
-      Duration year: {{ obj.duration }} <br>
       Description: {{ obj.description }} <br>
   </div> 
   {% endfor %}

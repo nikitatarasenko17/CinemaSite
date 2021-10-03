@@ -1,13 +1,12 @@
 from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.mixins import LoginRequiredMixin, LoginSuperUserRequiredMixin
-from django.http import request 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from cinema.permission import LoginSuperUserRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils import timezone
-from datetime import date, timedelta
-from django.db.models import Sum
-from cinema.models import Hall, Movies, Sessions, Purchase
+from datetime import timedelta
+from cinema.models import MyUser, Hall, Movies, Sessions, Purchase
 from cinema.forms import RegisterForm, SessionCreateForm, HallsCreateForm, MoviesCreateForm, \
                         PurchaseForm, SortForm
 
@@ -38,19 +37,6 @@ class SessionsListView(ListView):
     extra_context = {'purchase_form': PurchaseForm, }
     paginate_by = 3
 
-    # def get_queryset(self):
-    #     today = timezone.now()
-    #     tomorrow = timezone.now() + timedelta(days=1)
-    #     if self.request.method =="POST":
-    #         user_form = SessionForm(data=self.request.POST)
-    #         if user_form.is_valid():
-    #             if self.request.POST['session_form'] == 'Today':
-    #                 self.queryset = Sessions.objects.filter(start_session_time__gte = today)
-    #             elif self.request.POST['session_form'] == 'Tomorrow':
-    #                 self.queryset = Sessions.objects.filter(start_session_time__gte = tomorrow) 
-    #     else:
-    #         user_form = SessionForm()
-    #     return self.queryset
     def get_queryset(self):
         today = timezone.now()
         tomorrow = timezone.now() + timedelta(days=1)
@@ -60,7 +46,7 @@ class SessionsListView(ListView):
             return super().get_queryset().filter(date_start_show__lte = today, date_end_show__gt = today)
         elif session_form == 'Tomorrow':
             return super().get_queryset().filter(date_start_show__lte = tomorrow, date_end_show__gt = tomorrow)
-        return super().get_queryset().filter(date_end_show__gt = today)
+        return super().get_queryset().filter(date_end_show__gte = today)
 
     def get_ordering(self):
         sort_form = self.request.GET.get('sort_form')
@@ -117,32 +103,33 @@ class ProductPurchaseView(LoginRequiredMixin, CreateView):
     success_url='/'
 
     def form_valid(self, form):
-        purchase = form.save(commit=False)
-        quantity = int(form.data['quantity'])
-        user = self.request.user
-        purchase.сonsumer = user
-        session = Sessions.objects.get(id=self.request.POST['session'])
-        purchase.session = session
-        hall = session.hall_name
-        total_quantity = session.purchase_session.aggregate(Sum('quantity'))['quantity__sum']
-        if not total_quantity:
-            total_quantity = 0
-        free_seats = hall.size - total_quantity
-        if free_seats < quantity:
-            messages.error(self.request, f'Dont enough free seats! Available seats: {free_seats}')
-            return redirect(f"/")
-        user.spent += quantity * session.price
-        user.save()
-        purchase.save()
-        return super().form_valid(form=form)
+            purchase = form.save(commit=False)
+            quantity = int(form.data['quantity'])
+            user = self.request.user
+            purchase.сonsumer = user
+            session = Sessions.objects.get(id=self.request.POST['session'])
+            purchase.session = session
+            total_quantity = purchase.quantity
+            if not total_quantity:
+                total_quantity = 0
+            free_seats = session.free_seats - total_quantity
+            if free_seats < 0:
+                messages.error(self.request, f'Dont enough free seats!')
+                return redirect(f"/")
+            session.free_seats = free_seats
+            session.save()
+            user.spent += quantity * session.price
+            user.save()
+            purchase.save()
+            return super().form_valid(form=form)
        
 class ProductPurchaseListView(LoginRequiredMixin, ListView):
     login_url = "login/"
     model = Purchase
     template_name = 'purchases_list.html'
     
-    # def get_queryset(self):
-    #     return super().get_queryset().filter(consumer=self.request.user)
+    def get_queryset(self):
+        return self.request.user.consumer_purchase.all()
 
 class UpdateProductView(LoginSuperUserRequiredMixin, UpdateView):
     template_name = 'update_sessions.html'
@@ -150,13 +137,7 @@ class UpdateProductView(LoginSuperUserRequiredMixin, UpdateView):
     form_class = SessionCreateForm
     success_url = '/'
 
-class UpdateProductView(LoginSuperUserRequiredMixin, UpdateView):
-    template_name = 'update_sessions.html'
-    model = Sessions
-    form_class = SessionCreateForm
-    success_url = '/'
-
-
+           
 class UpdateHallsView(LoginSuperUserRequiredMixin, UpdateView):
     template_name = 'update_halls.html'
     model = Hall

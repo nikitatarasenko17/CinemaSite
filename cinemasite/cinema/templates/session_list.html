@@ -65,13 +65,16 @@
       </form>
     </div>
     <div>
+
+    {% if session.free_seats == session.hall_name.size %}
       <form method="get" action="{% url 'update_sessions' session.pk %}">
         <button type="submit" value="Update movie" class="btn btn-primary m-1">Update sessions</button> 
       </form> 
 
       <form method="get" action="{% url 'update_halls' session.hall_name.pk %}">
         <button type="submit" value="Update halls" class="btn btn-primary m-1">Update halls</button> 
-      </form>       
+      </form>    
+      {% endif %}
     </div>
     </div> 
 </div>
@@ -92,7 +95,7 @@
       <h6>End session time: {{ session.end_session_time }}</h6>
       <h6>Date start show: {{ session.date_start_show }}</h6>
       <h6>Date end show: {{ session.date_end_show }}</h6>  
-      <h6>Free seats: {{ session.free_seats }}</h6>  
+      <h6>Free seats: {{ session.free_seats}}</h6>  
       <h6>Price: {{ session.price}}</h6>  
       <h6>Is active: {{ session.is_active}}</h6><br>
       {{ purchase_form }}

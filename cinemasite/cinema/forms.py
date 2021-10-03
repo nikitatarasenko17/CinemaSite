@@ -34,7 +34,7 @@ class HallsCreateForm(ModelForm):
 class MoviesCreateForm(ModelForm):
     class Meta:
         model = Movies
-        fields = ['title', 'duration', 'description']
+        fields = ['title', 'description']
 
 
 class SortForm(forms.Form):
@@ -62,4 +62,4 @@ class PurchaseForm(ModelForm):
     quantity = forms.IntegerField(min_value=1)
     class Meta:
         model = Purchase
-        fields = ('quantity',)
+        fields = ['quantity',]
