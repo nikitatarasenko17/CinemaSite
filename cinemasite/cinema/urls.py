@@ -1,4 +1,5 @@
-from cinema.API.resources import HallViewSet, TomorrowSessionsViewSet, TodaySessionsViewSet, PurchaseViewSet, MovieViewSet
+from cinema.API.resources import HallViewSet, CreateSessionsViewSet, TomorrowSessionsViewSet, TodaySessionsViewSet, \
+                                PurchaseViewSet, MovieViewSet, HallUpdateViewSet
 from .views import SessionsListView, Login, Register, Logout, SessionCreateView, UpdateProductView,\
                     HallsCreateView, UpdateHallsView, MoviesCreateView, MoviesListView, ProductPurchaseView, ProductPurchaseListView
 from rest_framework.routers import SimpleRouter
@@ -7,6 +8,7 @@ from rest_framework.authtoken import views
 
 router = SimpleRouter()
 router.register(r'halls', HallViewSet)
+router.register(r'session_create', CreateSessionsViewSet)
 router.register(r'today_sessions', TodaySessionsViewSet)
 router.register(r'tomorrow_sessions', TomorrowSessionsViewSet)
 router.register(r'purchases', PurchaseViewSet)
@@ -27,4 +29,5 @@ urlpatterns = [
     path('list_of_purchases', ProductPurchaseListView.as_view(), name = 'list_of_purchases'),
     path('api/', include(router.urls)),
     path('api-token-auth/', views.obtain_auth_token),
+    path('api/halls/<int:pk>/', HallUpdateViewSet.as_view(), name="update"),
 ]

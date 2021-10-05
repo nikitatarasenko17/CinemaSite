@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils import timezone
 from datetime import timedelta
-from cinema.models import MyUser, Hall, Movies, Sessions, Purchase
+from cinema.models import Hall, Movies, Sessions, Purchase
 from cinema.forms import RegisterForm, SessionCreateForm, HallsCreateForm, MoviesCreateForm, \
                         PurchaseForm, SortForm
 
@@ -33,7 +33,6 @@ class Register(CreateView):
 class SessionsListView(ListView):
     model = Sessions
     template_name = 'session_list.html'
-    # form_class = SessionForm
     extra_context = {'purchase_form': PurchaseForm, }
     paginate_by = 3
 

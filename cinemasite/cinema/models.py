@@ -32,11 +32,11 @@ class Movies(models.Model):
 
 class Sessions(models.Model):
     movie_title = models.ForeignKey(Movies, on_delete=models.CASCADE, related_name='movie_title')
-    hall_name = models.ForeignKey(Hall, on_delete=models.CASCADE, related_name='hall_name')
+    hall_name = models.ForeignKey(Hall, on_delete=models.CASCADE, related_name='sessions', verbose_name='Hall')
     start_session_time = models.TimeField(blank=True, null=True)
     end_session_time = models.TimeField(blank=True, null=True)
-    date_start_show = models.DateTimeField(blank=True, null=True)
-    date_end_show = models.DateTimeField(blank=True, null=True)
+    date_start_show = models.DateField(blank=True, null=True)
+    date_end_show = models.DateField(blank=True, null=True)
     free_seats = models.PositiveSmallIntegerField(default=0)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     is_active = models.BooleanField(default=True)
