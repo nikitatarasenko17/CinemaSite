@@ -39,23 +39,22 @@ class SessionsSerializer(serializers.ModelSerializer):
         return data    
 
 class PurchaseSerializer(serializers.ModelSerializer):
-
+    
     class Meta:
         model = Purchase
         fields = '__all__'
 
-    # def user_spent(self, obj):
-    #     return obj.consumer.spent
+    def user_spent(self, obj):
+        return obj.consumer.spent
 
-    # def validate(self, data):
-    #     quantity = data['quantity']
-    #     session = Sessions.objects.get(id=data['session'].id)
-    #     user = MyUser.objects.get(id = self.context['request'].consumer_purchase.id)
-    #     if (session.free_seats - quantity) < 0:
-    #         raise serializers.ValidationError(f'Dont enough free seats!')
-    #     session.free_seats -= quantity
-    #     user.spent += quantity*session.price
-    #     session.save()
-    #     user.save()
-    #     data['consumer'] = user
-    #     return data
+    def validate(self, data):
+        quantity = data['quantity']
+        session = Sessions.objects.get(id = data['session'].id)
+        user = MyUser.objects.get(id = self.context['request'].user.id)
+        if (session.free_seats - quantity) < 0:
+            raise serializers.ValidationError(f'Dont enough free seats!')
+        session.free_seats -= quantity
+        user.spent += quantity*session.price
+        session.save()
+        user.save()
+        return data
