@@ -27,9 +27,9 @@ class SessionIdleTimeout(MiddlewareMixin):
     def process_request(self, request):
         current_datetime = datetime.timestamp(datetime.now())
         if ('last_activity' in request.session) and not request.user.is_superuser and \
-            (current_datetime - request.session['last_activity']) > 6000000: 
+            (current_datetime - request.session['last_activity']) > 60: 
             logout(request)
-            messages.add_message(request, messages.ERROR, 'Your session has been timed out.')
+            # messages.add_message(request, messages.ERROR, 'Your session has been timed out.')
             return HttpResponseRedirect(reverse('login'))
         else:
             request.session['last_activity'] = current_datetime
