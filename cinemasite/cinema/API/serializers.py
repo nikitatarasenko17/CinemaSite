@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.db.models import Sum
 from cinema.models import MyUser, Hall, Movies, Sessions, Purchase
 
 class UserSerializer(serializers.ModelSerializer):
@@ -13,17 +12,11 @@ class MovieSerializer(serializers.ModelSerializer):
         model = Movies
         fields = '__all__'        
 
-class HallSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Hall
-        fields = '__all__'
-        
-
+       
 class SessionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sessions
         fields = '__all__'
-
 
     def validate(self, data):
         on_air = Sessions.objects.filter(hall_name=data['hall_name'])
@@ -38,8 +31,28 @@ class SessionsSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Session start cannot be greater than the end')
         return data    
 
-class PurchaseSerializer(serializers.ModelSerializer):
+class HallSerializer(serializers.ModelSerializer):
+    sessions = SessionsSerializer(many=True)
+    size = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = Hall
+        fields = '__all__'
     
+    def validate(self, data):
+        if self.instance:
+            size  = self.instance.size
+            hall_id = self.instance.id
+            sessions  = Hall.objects.get(id=hall_id).sessions.filter(free_seats__lt=size)
+            if sessions:
+                raise serializers.ValidationError('This hall doesnt available to update')
+            size = data['size']
+            Sessions.objects.get(id=hall_id).sessions.all().update(free_seats=self.size)
+        return data
+
+
+class PurchaseSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Purchase
         fields = '__all__'

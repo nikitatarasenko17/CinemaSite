@@ -3,7 +3,7 @@ from cinema.models import MyUser
 from cinema.API.autentification import TemporaryTokenAuthentication
 from rest_framework.generics import RetrieveUpdateAPIView
 from cinema.API.serializers import UserSerializer, HallSerializer, SessionsSerializer, PurchaseSerializer, MovieSerializer
-from cinema.API.permissions import SuperUserPermissionToSessionUpdate
+# from cinema.API.permissions import SuperUserPermissionToSessionUpdate
 from cinema.models import Hall, Movies, Sessions, Purchase, MyUser  
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import mixins
@@ -46,10 +46,6 @@ class HallUpdateViewSet(RetrieveUpdateAPIView):
     permission_classes = [IsAdminUser, ]
     pagination_class = PersonalSetNumberPaginator
 
-    def get_permissions(self):
-        if self.request.method in ['PATCH', 'PUT']:
-            self.permission_classes += [SuperUserPermissionToSessionUpdate]
-        return super().get_permissions()
 
 class CreateSessionsViewSet(ModelViewSet):
     queryset = Sessions.objects.all()
